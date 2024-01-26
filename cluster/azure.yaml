@@ -1,0 +1,16 @@
+apiVersion: devopstoolkitseries.com/v1alpha1
+kind: ClusterClaim
+metadata:
+  name: cluster
+spec:
+  id: ateamcluster
+  compositionSelector:
+    matchLabels:
+      provider: azure
+      cluster: aks
+  parameters:
+    nodeSize: medium
+    minNodeCount: 1
+    namespaces:
+      - dev
+      - production
