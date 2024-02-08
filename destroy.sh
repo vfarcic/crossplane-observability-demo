@@ -57,4 +57,4 @@ else
 
 fi
 
-kind delete cluster
+kind delete cluster --name crossplane-observability-demo

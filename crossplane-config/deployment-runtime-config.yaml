@@ -1,0 +1,12 @@
+apiVersion: pkg.crossplane.io/v1beta1
+kind: DeploymentRuntimeConfig
+metadata:
+  name: default
+  namespace: crossplane-system
+spec:
+  deploymentTemplate:
+    metadata:
+      annotations:
+        metrics.dynatrace.com/scrape: "true"
+        metrics.dynatrace.com/port: "8080"
+        metrics.dynatrace.com/path: /metrics
