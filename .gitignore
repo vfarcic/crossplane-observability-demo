@@ -1,0 +1,6 @@
+.idea
+bin
+
+*-creds.conf
+.env
+*.local.yaml

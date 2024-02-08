@@ -49,7 +49,7 @@ echo "export HYPERSCALER=$HYPERSCALER" >> .env
 
 echo "# Cluster" | gum format
 
-kind create cluster
+kind create cluster --name crossplane-observability-demo
 
 kubectl create namespace a-team
 
@@ -64,7 +64,9 @@ helm repo add crossplane-stable https://charts.crossplane.io/stable
 helm repo update
 
 helm upgrade --install crossplane crossplane-stable/crossplane \
-    --namespace crossplane-system --create-namespace --wait
+    --namespace crossplane-system --create-namespace \
+    --values ./crossplane-config/values.yaml \
+    --wait
 
 if [[ "$HYPERSCALER" == "google" ]]; then
 
@@ -122,7 +124,7 @@ elif [[ "$HYPERSCALER" == "aws" ]]; then
 
     AWS_ACCESS_KEY_ID=$(gum input --placeholder "AWS Access Key ID" --value "$AWS_ACCESS_KEY_ID")
     echo "export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID" >> .env
-    
+
     AWS_SECRET_ACCESS_KEY=$(gum input --placeholder "AWS Secret Access Key" --value "$AWS_SECRET_ACCESS_KEY" --password)
     echo "export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY" >> .env
 
@@ -201,6 +203,47 @@ echo "# Atlas Operator" | gum format
 helm upgrade --install atlas-operator \
     oci://ghcr.io/ariga/charts/atlas-operator \
     --namespace atlas-operator --create-namespace --wait
+
+#############
+# Dynatrace #
+#############
+
+echo "# Dynatrace" | gum format
+
+gum confirm '
+To configure Dynatrace, you need to complete a few manual steps:
+
+- Navigate to the Dynatrace Kubernetes app and click "Add cluster"
+- Select "Other distributions"
+- Enter "crossplane-observability-demo" as cluster name
+- Generate the needed tokens
+
+Ready?
+' || exit 0
+
+DYNATRACE_URL=$(gum input --placeholder "Dynatrace URL" --value "$DYNATRACE_URL")
+echo "export DYNATRACE_URL=$DYNATRACE_URL" >> .env
+
+DYNATRACE_OPERATOR_TOKEN=$(gum input --placeholder "Dynatrace Operator Token" --value "$DYNATRACE_OPERATOR_TOKEN" --password)
+echo "export DYNATRACE_OPERATOR_TOKEN=$DYNATRACE_OPERATOR_TOKEN" >> .env
+
+DYNATRACE_DATA_INGEST_TOKEN=$(gum input --placeholder "Dynatrace Data Ingest Token" --value "$DYNATRACE_DATA_INGEST_TOKEN" --password)
+echo "export DYNATRACE_DATA_INGEST_TOKEN=$DYNATRACE_DATA_INGEST_TOKEN" >> .env
+
+helm upgrade dynatrace-operator oci://docker.io/dynatrace/dynatrace-operator \
+    --set "installCRD=true" \
+    --set "csidriver.enabled=true" \
+    --atomic \
+    --create-namespace --namespace dynatrace \
+    --install
+
+kubectl --namespace dynatrace \
+    create secret generic crossplane-observability-demo \
+    --from-literal=apiToken=$DYNATRACE_OPERATOR_TOKEN \
+    --from-literal=dataIngestToken=$DYNATRACE_DATA_INGEST_TOKEN
+
+yq --inplace ".spec.apiUrl = \"$DYNATRACE_URL/api\"" ./observability/dynatrace/dynakube.yaml
+kubectl --namespace dynatrace apply -f ./observability/dynatrace/dynakube.yaml
 
 ########
 # Misc #
