@@ -13,11 +13,8 @@ echo "
 |----------------|---------------------|---------------------------------------------------|
 |Docker          |Yes                  |'https://docs.docker.com/engine/install'           |
 |kind CLI        |Yes                  |'https://kind.sigs.k8s.io/docs/user/quick-start/#installation'|
-|Google Cloud account with admin permissions|If using Google Cloud|'https://cloud.google.com'|
-|Google Cloud CLI|If using Google Cloud|'https://cloud.google.com/sdk/docs/install'        |
-|gke-gcloud-auth-plugin|If using Google Cloud|'https://cloud.google.com/blog/products/containers-kubernetes/kubectl-auth-changes-in-gke'|
-|AWS account with admin permissions|If using AWS|'https://aws.amazon.com'                  |
-|AWS CLI         |If using AWS         |'https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html'|
+|AWS account with admin permissions|Yes|'https://aws.amazon.com'                           |
+|AWS CLI         |Yes                  |'https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html'|
 
 If you are running this script from **Nix shell**, most of the requirements are already set with the exception of **Docker** and the **hyperscaler account**.
 " | gum format
@@ -32,29 +29,22 @@ Do you have those tools installed?
 
 echo "# Cluster" | gum format
 
-if [[ "$HYPERSCALER" == "google" ]]; then
+unset KUBECONFIG
 
-    gcloud projects delete $PROJECT_ID --quiet
+echo "## Deleting resoureces..." | gum format
 
-else
+kubectl --namespace a-team delete --filename cluster/aws.yaml
 
-    echo "## Deleting resoureces..." | gum format
-    kubectl --namespace a-team delete \
-        --filename cluster/$HYPERSCALER.yaml
+kubectl --namespace a-team delete --filename db/aws.yaml
 
-    kubectl --namespace a-team delete \
-        --filename db/$HYPERSCALER.yaml
+COUNTER=$(kubectl get managed --no-headers | grep -v object \
+    | grep -v release | grep -v database | wc -l)
 
+while [ $COUNTER -ne 0 ]; do
+    echo "$COUNTER resources left to be deleted..."
+    sleep 10
     COUNTER=$(kubectl get managed --no-headers | grep -v object \
-        | grep -v release | grep -v database | wc -l)
-
-    while [ $COUNTER -ne 0 ]; do
-        echo "$COUNTER resources left to be deleted..."
-        sleep 10
-        COUNTER=$(kubectl get managed --no-headers | grep -v object \
-            | grep -v release | grep -v database| wc -l)
-    done
-
-fi
+        | grep -v release | grep -v database| wc -l)
+done
 
 kind delete cluster --name crossplane-observability-demo

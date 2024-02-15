@@ -14,11 +14,18 @@ spec:
     size: medium
     databases:
       - my-db
+    secrets:
+      storeName: aws
+      pullRootPasswordKey: db-password
+      pushToStore: true
+      pullToCluster: a-team-cluster
+      pullToClusterNamespace: production
     schemas:
       - database: my-db
         sql: |
           create table videos (
             id varchar(50) not null,
+            title text,
             description text,
             primary key (id)
           );

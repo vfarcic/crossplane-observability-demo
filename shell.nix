@@ -12,8 +12,9 @@ pkgs.mkShell {
     kubectl
     kind
     yq-go
+    jq
     bat
-    azure-cli
+    awscli2
   ];
   shellHook =
   ''

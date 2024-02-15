@@ -1,6 +1,8 @@
 .idea
 bin
-
 *-creds.conf
 .env
 *.local.yaml
+/azure-creds.json
+/gcp-creds.json
+/kubeconfig.yaml

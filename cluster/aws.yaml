@@ -14,3 +14,17 @@ spec:
     namespaces:
       - dev
       - production
+      - crossplane-system
+    apps:
+      externalSecrets:
+        enabled: true
+        store: true
+        awsAccessKeyIDKey: accessKeyID
+        awsSecretAccessKeyKey: secretAccessKey        
+    creds:
+      name: aws-creds
+      namespace: crossplane-system
+      keys:
+        - creds
+        - accessKeyID
+        - secretAccessKey
