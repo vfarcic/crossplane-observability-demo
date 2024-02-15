@@ -19,8 +19,6 @@ spec:
       externalSecrets:
         enabled: true
         store: true
-        awsAccessKeyIDKey: accessKeyID
-        awsSecretAccessKeyKey: secretAccessKey
       traefik:
         enabled: true
     creds:
