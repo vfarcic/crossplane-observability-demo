@@ -95,8 +95,6 @@ kubectl wait --for=condition=healthy provider.pkg.crossplane.io \
 kubectl apply \
     --filename crossplane-packages/aws-config.yaml
 
-kubectl --namespace a-team apply --filename db/password.yaml
-
 ##################
 # Atlas Operator #
 ##################

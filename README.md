@@ -2,13 +2,6 @@
 
 FIXME: Add Ingress to the cluster
 
-```sh
-# FIXME: Remove
-helm upgrade --install traefik traefik \
-    --repo https://helm.traefik.io/traefik \
-    --namespace traefik --create-namespace --wait
-```
-
 FIXME: Tested only on AWS
 
 ## Setup
@@ -89,6 +82,8 @@ The Dynatrace operator is installed and configured via the setup script.
 FIXME: @Kathi: Add (eventually automate) instructions on how to add dashboards
 
 ## Destroy
+
+FIXME: Delete LB Service
 
 ```sh
 ./destroy.sh

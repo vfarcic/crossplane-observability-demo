@@ -20,7 +20,9 @@ spec:
         enabled: true
         store: true
         awsAccessKeyIDKey: accessKeyID
-        awsSecretAccessKeyKey: secretAccessKey        
+        awsSecretAccessKeyKey: secretAccessKey
+      traefik:
+        enabled: true
     creds:
       name: aws-creds
       namespace: crossplane-system
