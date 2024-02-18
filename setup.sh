@@ -152,12 +152,20 @@ echo "export DYNATRACE_OPERATOR_TOKEN=$DYNATRACE_OPERATOR_TOKEN" >> .env
 DYNATRACE_DATA_INGEST_TOKEN=$(gum input --placeholder "Dynatrace Data Ingest Token" --value "$DYNATRACE_DATA_INGEST_TOKEN" --password)
 echo "export DYNATRACE_DATA_INGEST_TOKEN=$DYNATRACE_DATA_INGEST_TOKEN" >> .env
 
-helm upgrade dynatrace-operator oci://docker.io/dynatrace/dynatrace-operator \
-    --set "installCRD=true" \
-    --set "csidriver.enabled=true" \
-    --atomic \
-    --create-namespace --namespace dynatrace \
-    --install
+set +e
+aws secretsmanager delete-secret --secret-id dynatrace-tokens \
+    --region us-east-1 --force-delete-without-recovery \
+    --no-cli-page
+set -e
+
+aws secretsmanager create-secret \
+    --name dynatrace-tokens --region us-east-1 \
+    --secret-string "{\"apiToken\": \"$DYNATRACE_OPERATOR_TOKEN\", \"dataIngestToken\": \"$DYNATRACE_DATA_INGEST_TOKEN\"}"
+
+helm upgrade --install \
+    dynatrace-operator oci://docker.io/dynatrace/dynatrace-operator \
+    --set installCRD=true --set csidriver.enabled=true \
+    --atomic --create-namespace --namespace dynatrace --wait
 
 kubectl --namespace dynatrace \
     create secret generic crossplane-observability-demo \
