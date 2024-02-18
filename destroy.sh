@@ -31,7 +31,23 @@ echo "# Cluster" | gum format
 
 unset KUBECONFIG
 
-echo "## Deleting resoureces..." | gum format
+echo "## Deleting resources..." | gum format
+
+set +e
+
+# Crossplane will delete the secret, but, by default, AWS
+#   only schedules it for deletion. 
+# The command that follows removes the secret immediately
+#   just in case you want to re-run the demo.
+
+aws secretsmanager delete-secret --secret-id my-db \
+    --region us-east-1 --force-delete-without-recovery \
+    --no-cli-pager
+aws secretsmanager delete-secret --secret-id db-password \
+    --region us-east-1 --force-delete-without-recovery \
+    --no-cli-page
+
+set -e
 
 kubectl --namespace a-team delete --filename cluster/aws.yaml
 

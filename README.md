@@ -75,15 +75,19 @@ curl -X POST \
 curl "http://sillydemo.$INGRESS_IP.nip.io/videos" | jq .
 ```
 
+Stop the DB instance from the AWS console
+
 ## Dynatrace
 
 The Dynatrace operator is installed and configured via the setup script.
 
 FIXME: @Kathi: Add (eventually automate) instructions on how to add dashboards
 
-## Destroy
+```sh
+curl "http://sillydemo.$INGRESS_IP.nip.io/videos"
+```
 
-FIXME: Delete LB Service
+## Destroy
 
 ```sh
 ./destroy.sh
