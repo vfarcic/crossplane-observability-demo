@@ -19,7 +19,13 @@ spec:
       externalSecrets:
         enabled: true
         store: true
+        secrets:
+          - fromSecret: dynatrace-tokens
+            toSecret: else
+            toNamespace: dynatrace
       traefik:
+        enabled: true
+      dynatrace:
         enabled: true
     creds:
       name: aws-creds

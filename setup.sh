@@ -162,11 +162,12 @@ aws secretsmanager create-secret \
     --name dynatrace-tokens --region us-east-1 \
     --secret-string "{\"apiToken\": \"$DYNATRACE_OPERATOR_TOKEN\", \"dataIngestToken\": \"$DYNATRACE_DATA_INGEST_TOKEN\"}"
 
-helm upgrade --install \
-    dynatrace-operator oci://docker.io/dynatrace/dynatrace-operator \
+helm upgrade --install dynatrace-operator \
+    oci://docker.io/dynatrace/dynatrace-operator \
     --set installCRD=true --set csidriver.enabled=true \
     --atomic --create-namespace --namespace dynatrace --wait
 
+# FIXME: Switch to `external-secrets`
 kubectl --namespace dynatrace \
     create secret generic crossplane-observability-demo \
     --from-literal=apiToken=$DYNATRACE_OPERATOR_TOKEN \
