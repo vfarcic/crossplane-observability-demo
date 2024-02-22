@@ -173,7 +173,13 @@ kubectl --namespace dynatrace \
     --from-literal=apiToken=$DYNATRACE_OPERATOR_TOKEN \
     --from-literal=dataIngestToken=$DYNATRACE_DATA_INGEST_TOKEN
 
-yq --inplace ".spec.apiUrl = \"$DYNATRACE_URL/api\"" ./observability/dynatrace/dynakube.yaml
+yq --inplace ".spec.apiUrl = \"$DYNATRACE_URL/api\"" \
+    ./observability/dynatrace/dynakube.yaml
+
+yq --inplace \
+    ".spec.parameters.apps.dynatrace.apiUrl = \"$DYNATRACE_URL/api\"" \
+    cluster/aws.yaml
+
 kubectl --namespace dynatrace apply -f ./observability/dynatrace/dynakube.yaml
 
 ########
