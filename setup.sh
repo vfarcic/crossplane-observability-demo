@@ -180,7 +180,8 @@ yq --inplace \
     ".spec.parameters.apps.dynatrace.apiUrl = \"$DYNATRACE_URL/api\"" \
     cluster/aws.yaml
 
-kubectl --namespace dynatrace apply -f ./observability/dynatrace/dynakube.yaml
+kubectl --namespace dynatrace apply \
+    --filename observability/dynatrace/dynakube.yaml
 
 ########
 # Misc #

@@ -15,6 +15,7 @@ pkgs.mkShell {
     jq
     bat
     awscli2
+    teller
   ];
   shellHook =
   ''
