@@ -40,11 +40,11 @@ kind create cluster --name crossplane-observability-demo
 
 kubectl create namespace a-team
 
-##############
-# Crossplane #
-##############
+#################
+# Control Plane #
+#################
 
-echo "# Crossplane" | gum format
+echo "# Control Plane" | gum format
 
 helm repo add crossplane-stable https://charts.crossplane.io/stable
 
@@ -143,7 +143,7 @@ To configure Dynatrace, you need to complete a few manual steps:
 Ready?
 ' || exit 0
 
-DYNATRACE_URL=$(gum input --placeholder "Dynatrace URL" --value "$DYNATRACE_URL")
+DYNATRACE_URL=$(gum input --placeholder "Dynatrace URL (e.g., https://ENVIRONMENTID.live.dynatrace.com)" --value "$DYNATRACE_URL")
 echo "export DYNATRACE_URL=$DYNATRACE_URL" >> .env
 
 DYNATRACE_OPERATOR_TOKEN=$(gum input --placeholder "Dynatrace Operator Token" --value "$DYNATRACE_OPERATOR_TOKEN" --password)
@@ -151,16 +151,6 @@ echo "export DYNATRACE_OPERATOR_TOKEN=$DYNATRACE_OPERATOR_TOKEN" >> .env
 
 DYNATRACE_DATA_INGEST_TOKEN=$(gum input --placeholder "Dynatrace Data Ingest Token" --value "$DYNATRACE_DATA_INGEST_TOKEN" --password)
 echo "export DYNATRACE_DATA_INGEST_TOKEN=$DYNATRACE_DATA_INGEST_TOKEN" >> .env
-
-set +e
-aws secretsmanager delete-secret --secret-id dynatrace-tokens \
-    --region us-east-1 --force-delete-without-recovery \
-    --no-cli-page
-set -e
-
-aws secretsmanager create-secret \
-    --name dynatrace-tokens --region us-east-1 \
-    --secret-string "{\"apiToken\": \"$DYNATRACE_OPERATOR_TOKEN\", \"dataIngestToken\": \"$DYNATRACE_DATA_INGEST_TOKEN\"}"
 
 helm upgrade --install dynatrace-operator \
     oci://docker.io/dynatrace/dynatrace-operator \
@@ -179,12 +169,22 @@ yq --inplace ".spec.apiUrl = \"$DYNATRACE_URL/api\"" \
 yq --inplace ".spec.apiUrl = \"$DYNATRACE_URL/api\"" \
     ./observability/dynatrace/dynakube-app.yaml
 
-# yq --inplace \
-#     ".spec.parameters.apps.dynatrace.apiUrl = \"$DYNATRACE_URL/api\"" \
-#     cluster/aws.yaml
-
 kubectl --namespace dynatrace apply \
     --filename observability/dynatrace/dynakube.yaml
+
+yq --inplace \
+    ".spec.parameters.apps.dynatrace.apiUrl = \"$DYNATRACE_URL/api\"" \
+    cluster/aws.yaml
+
+set +e
+aws secretsmanager delete-secret --secret-id dynatrace-tokens \
+    --region us-east-1 --force-delete-without-recovery \
+    --no-cli-page
+set -e
+
+aws secretsmanager create-secret \
+    --name dynatrace-tokens --region us-east-1 \
+    --secret-string "{\"apiToken\": \"$DYNATRACE_OPERATOR_TOKEN\", \"dataIngestToken\": \"$DYNATRACE_DATA_INGEST_TOKEN\"}"
 
 ########
 # Misc #

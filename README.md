@@ -51,26 +51,26 @@ crossplane beta trace sqlclaim my-db --namespace a-team
 ```sh
 export KUBECONFIG=$PWD/kubeconfig.yaml
 
-helm upgrade --install dynatrace-operator \
-    oci://docker.io/dynatrace/dynatrace-operator \
-    --set installCRD=true --set csidriver.enabled=true \
-    --atomic --create-namespace --namespace dynatrace --wait
+aws eks update-kubeconfig --region us-east-1 \
+    --name a-team-cluster --kubeconfig $KUBECONFIG
 
-kubectl --namespace dynatrace \
-    create secret generic app \
-    --from-literal=apiToken=$DYNATRACE_OPERATOR_TOKEN \
-    --from-literal=dataIngestToken=$DYNATRACE_DATA_INGEST_TOKEN
+# helm upgrade --install dynatrace-operator \
+#     oci://docker.io/dynatrace/dynatrace-operator \
+#     --set installCRD=true --set csidriver.enabled=true \
+#     --atomic --create-namespace --namespace dynatrace --wait
 
-kubectl --namespace dynatrace apply \
-    --filename observability/dynatrace/dynakube-app.yaml
+# kubectl --namespace dynatrace \
+#     create secret generic app \
+#     --from-literal=apiToken=$DYNATRACE_OPERATOR_TOKEN \
+#     --from-literal=dataIngestToken=$DYNATRACE_DATA_INGEST_TOKEN
+
+# kubectl --namespace dynatrace apply \
+#     --filename observability/dynatrace/dynakube-app.yaml
 ```
 
 ## App
 
 ```sh
-aws eks update-kubeconfig --region us-east-1 \
-    --name a-team-cluster --kubeconfig $KUBECONFIG
-
 export INGRESS_HOSTNAME=$(kubectl --namespace traefik \
     get service traefik \
     --output jsonpath="{.status.loadBalancer.ingress[0].hostname}")
