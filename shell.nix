@@ -6,7 +6,6 @@ in
 pkgs.mkShell {
   packages = with pkgs; [
     gum
-    git
     gh
     kubernetes-helm
     kubectl
