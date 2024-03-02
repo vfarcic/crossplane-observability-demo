@@ -1,9 +1,9 @@
 apiVersion: devopstoolkitseries.com/v1alpha1
 kind: ClusterClaim
 metadata:
-  name: cluster
+  name: cluster-2
 spec:
-  id: a-team-cluster
+  id: a-team-cluster-2
   compositionSelector:
     matchLabels:
       provider: aws
@@ -19,15 +19,8 @@ spec:
       externalSecrets:
         enabled: true
         store: true
-        # secrets:
-        #   - fromSecret: dynatrace-tokens
-        #     toSecret: a-team-cluster
-        #     toNamespace: dynatrace
       traefik:
         enabled: true
-      # dynatrace:
-      #   enabled: true
-      #   apiUrl: https://ypd98635.sprint.dynatracelabs.com/api
     creds:
       name: aws-creds
       namespace: crossplane-system

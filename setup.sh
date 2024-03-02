@@ -143,7 +143,7 @@ To configure Dynatrace, you need to complete a few manual steps:
 Ready?
 ' || exit 0
 
-DYNATRACE_URL=$(gum input --placeholder "Dynatrace URL (e.g., https://ENVIRONMENTID.live.dynatrace.com)" --value "$DYNATRACE_URL")
+DYNATRACE_URL=$(gum input --placeholder "Dynatrace URL (e.g., https://ENVIRONMENTID.sprint.dynatracelabs.com)" --value "$DYNATRACE_URL")
 echo "export DYNATRACE_URL=$DYNATRACE_URL" >> .env
 
 DYNATRACE_OPERATOR_TOKEN=$(gum input --placeholder "Dynatrace Operator Token" --value "$DYNATRACE_OPERATOR_TOKEN" --password)
@@ -180,6 +180,7 @@ set +e
 aws secretsmanager delete-secret --secret-id dynatrace-tokens \
     --region us-east-1 --force-delete-without-recovery \
     --no-cli-page
+sleep 3
 set -e
 
 aws secretsmanager create-secret \

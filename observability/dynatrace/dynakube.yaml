@@ -6,7 +6,7 @@ metadata:
   annotations:
     feature.dynatrace.com/k8s-app-enabled: "true"
 spec:
-  apiUrl: https://ypd98635.sprint.apps.dynatracelabs.com//api
+  apiUrl: https://ypd98635.sprint.dynatracelabs.com/api
   oneAgent:
     applicationMonitoring:
       useCSIDriver: true

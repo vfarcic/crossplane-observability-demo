@@ -1,0 +1,38 @@
+---
+apiVersion: devopstoolkitseries.com/v1alpha1
+kind: SQLClaim
+metadata:
+  name: my-db-2
+spec:
+  id: my-db-2
+  compositionSelector:
+    matchLabels:
+      provider: aws
+      db: postgresql
+  parameters:
+    version: "14.10"
+    size: medium
+    databases:
+      - my-db
+    secrets:
+      storeName: aws
+      pullRootPasswordKey: db-password
+      pushToStore: true
+      pullToCluster: a-team-cluster-2
+      pullToClusterNamespace: production
+    schemas:
+      - database: my-db
+        sql: |
+          create table videos (
+            id varchar(50) not null,
+            title text,
+            description text,
+            primary key (id)
+          );
+          create table comments (
+            id serial,
+            video_id varchar(50) not null,
+            description text not null,
+            primary key (id),
+            CONSTRAINT fk_videos FOREIGN KEY(video_id) REFERENCES videos(id)
+          );
