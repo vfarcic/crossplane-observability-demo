@@ -19,8 +19,15 @@ spec:
       externalSecrets:
         enabled: true
         store: true
+        secrets:
+          - fromSecret: dynatrace-tokens
+            toSecret: a-team-cluster-2
+            toNamespace: dynatrace
       traefik:
         enabled: true
+      dynatrace:
+        enabled: true
+        apiUrl: https://ypd98635.sprint.dynatracelabs.com/api
     creds:
       name: aws-creds
       namespace: crossplane-system
