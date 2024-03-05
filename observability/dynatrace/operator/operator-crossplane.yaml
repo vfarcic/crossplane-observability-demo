@@ -1,0 +1,51 @@
+apiVersion: helm.crossplane.io/v1beta1
+kind: Release
+metadata:
+  name: dynatrace-operator
+spec:
+  forProvider:
+    chart:
+      name: dynatrace-operator
+      repository: https://raw.githubusercontent.com/Dynatrace/dynatrace-operator/main/config/helm/repos/stable
+      version: 0.15.0
+    set:
+      - name: installCRD
+        value: "true"
+      - name: csidriver.enabled
+        value: "true"
+    namespace: dynatrace
+  rollbackLimit: 3
+---
+apiVersion: kubernetes.crossplane.io/v1alpha2
+kind: Object
+metadata:
+  name: crossplane-dynatrace-test
+spec:
+  forProvider:
+    manifest:
+      apiVersion: dynatrace.com/v1beta1
+      kind: DynaKube
+      metadata:
+        name: crossplane-dynatrace-test
+        namespace: dynatrace
+        annotations:
+          feature.dynatrace.com/k8s-app-enabled: "true"
+      spec:
+        apiUrl: https://ypd98635.sprint.dynatracelabs.com/api
+        oneAgent:
+          cloudNativeFullStack:
+            image: ""
+        activeGate:
+          capabilities:
+            - kubernetes-monitoring
+            - routing
+            - metrics-ingest
+            - dynatrace-api
+          image: ""
+          resources:
+            requests:
+              cpu: 500m
+              memory: 512Mi
+            limits:
+              cpu: 1000m
+              memory: 1.5Gi

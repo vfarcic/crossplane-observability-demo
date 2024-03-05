@@ -1,0 +1,108 @@
+apiVersion: iam.aws.upbound.io/v1beta1
+kind: Role
+metadata:
+  name: dynatrace-active-gate
+spec:
+  forProvider:
+    description: Used for hosting the Active Gate
+    assumeRolePolicy: |
+      {
+        "Version": "2012-10-17",
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Principal": {
+              "Service": "ec2.amazonaws.com"
+            },
+            "Action": "sts:AssumeRole"
+          }
+        ]
+      }
+---
+apiVersion: iam.aws.upbound.io/v1beta1
+kind: Role
+metadata:
+  name: dynatrace-monitoring
+spec:
+  forProvider:
+    description: Used by Dynatrace to get monitoring data
+    # FIXME: Fix broad permissoins
+    assumeRolePolicy: |
+      {
+        "Version": "2012-10-17",
+        "Statement": [
+          {
+            "Effect": "Allow",
+            "Principal": {
+              "AWS": [
+                "*"
+              ]
+            },
+            "Action": "sts:AssumeRole"
+          }
+        ]
+      }
+---
+apiVersion: iam.aws.upbound.io/v1beta1
+kind: RolePolicyAttachment
+metadata:
+  name: dynatrace-active-gate.amazon-ssm-managed-instance-core
+spec:
+  forProvider:
+    policyArn: arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
+    role: dynatrace-active-gate
+---
+apiVersion: iam.aws.upbound.io/v1beta1
+kind: RolePolicyAttachment
+metadata:
+  name: dynatrace-active-gate.amazon-ssmp-patch-assocation
+spec:
+  forProvider:
+    policyArn: arn:aws:iam::aws:policy/AmazonSSMPatchAssociation
+    role: dynatrace-active-gate
+---
+apiVersion: iam.aws.upbound.io/v1beta1
+kind: RolePolicyAttachment
+metadata:
+  name: dynatrace-active-gate.amazon-ec2-read-only-access
+spec:
+  forProvider:
+    policyArn: arn:aws:iam::aws:policy/AmazonEC2ReadOnlyAccess
+    role: dynatrace-active-gate
+---
+apiVersion: iam.aws.upbound.io/v1beta1
+kind: RolePolicyAttachment
+metadata:
+  name: dynatrace-active-gate.amazon-api-gateway-push-to-cloud-watch-logs
+spec:
+  forProvider:
+    policyArn: arn:aws:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs
+    role: dynatrace-active-gate
+---
+apiVersion: iam.aws.upbound.io/v1beta1
+kind: RolePolicyAttachment
+metadata:
+  name: dynatrace-monitoring.dynatrace-monitoring
+spec:
+  forProvider:
+    policyArnRef:
+      name: dynatrace-monitoring
+    role: dynatrace-monitoring
+---
+apiVersion: iam.aws.upbound.io/v1beta1
+kind: RolePolicyAttachment
+metadata:
+  name: dynatrace-active-gate.dynatrace-monitoring
+spec:
+  forProvider:
+    policyArnRef:
+      name: dynatrace-monitoring
+    role: dynatrace-active-gate
+---
+apiVersion: iam.aws.upbound.io/v1beta1
+kind: InstanceProfile
+metadata:
+  name: dynatrace-active-gate
+spec:
+  forProvider:
+    role: dynatrace-active-gate
