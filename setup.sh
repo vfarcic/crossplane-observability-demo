@@ -183,9 +183,9 @@ gum confirm "
 Next, we are going to configure AWS monitoring. This means, we are going to deploy two IAM roles, an IAM policy and an EC2 instance.
 Please generate a token first:
 
-- Navigate to the Dynatrace 'AWS Classic' app (Ctrl + K and type AWS)
-- Select 'Enable AWS monitoring'
-- Select 'Connect new instance'
+- Navigate to the Dynatrace $(gum style --foreground 212 'AWS Classic') app (Ctrl + K and type AWS)
+- Select $(gum style --foreground 212 'Enable AWS monitoring')
+- Select $(gum style --foreground 212 'Connect new instance')
 - Enter the following data:
   - Connection Name: Whatever you prefer, this is the display name of the AWS connection (e.g. name of the AWS account)
   - Authentication method: $(gum style --foreground 212 'Role-based authentication')
@@ -211,8 +211,6 @@ yq -i e "(.spec.forProvider | select(has(\"userData\")).userData) = \"$AWS_USER_
 kubectl apply -f ./observability/dynatrace/aws/policy.yaml
 kubectl apply -f ./observability/dynatrace/aws/roles.yaml
 kubectl apply -f ./observability/dynatrace/aws/ec2.local.yaml
-
-kubectl wait ./observability/dynatrace/aws/ec2.local.yaml
 
 rm ./observability/dynatrace/aws/userData.local.txt
 rm ./observability/dynatrace/aws/ec2.local.yaml
