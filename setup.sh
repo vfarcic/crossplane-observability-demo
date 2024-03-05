@@ -254,7 +254,7 @@ set +e
 aws secretsmanager delete-secret --secret-id dynatrace-tokens \
     --region us-east-1 --force-delete-without-recovery \
     --no-cli-page
-sleep 3
+sleep 10
 set -e
 
 aws secretsmanager create-secret \
