@@ -46,8 +46,13 @@ aws secretsmanager delete-secret --secret-id my-db \
 aws secretsmanager delete-secret --secret-id db-password \
     --region us-east-1 --force-delete-without-recovery \
     --no-cli-page
+aws secretsmanager delete-secret --secret-id dynatrace-tokens \
+    --region us-east-1 --force-delete-without-recovery \
+    --no-cli-page
 
 set -e
+
+kubectl delete --filename observability/dynatrace/aws
 
 kubectl --namespace a-team delete --filename cluster/aws.yaml
 

@@ -1,0 +1,51 @@
+apiVersion: ec2.aws.upbound.io/v1beta1
+kind: SecurityGroup
+metadata:
+  name: dynatrace-active-gate
+spec:
+  forProvider:
+    region: us-east-1
+    name: dynatrace-active-gate
+---
+apiVersion: ec2.aws.upbound.io/v1beta1
+kind: SecurityGroupEgressRule
+metadata:
+  name: dynatrace-active-gate-egress
+spec:
+  forProvider:
+    region: us-east-1
+    securityGroupIdRef:
+      name: dynatrace-active-gate
+    cidrIpv4: 0.0.0.0/0
+    fromPort: 0
+    toPort: 0
+    ipProtocol: '-1'
+---
+apiVersion: ec2.aws.upbound.io/v1beta1
+kind: SecurityGroupIngressRule
+metadata:
+  name: dynatrace-active-gate-ingress
+spec:
+  forProvider:
+    region: us-east-1
+    securityGroupIdRef:
+      name: dynatrace-active-gate
+    cidrIpv4: 0.0.0.0/0
+    fromPort: 9999
+    toPort: 9999
+    ipProtocol: tcp
+---
+apiVersion: ec2.aws.upbound.io/v1beta1
+kind: Instance
+metadata:
+  name: dynatrace-active-gate
+spec:
+  forProvider:
+    ebsOptimized: true
+    region: us-east-1
+    ami: ami-0440d3b780d96b29d
+    vpcSecurityGroupIdRefs:
+      - name: dynatrace-active-gate
+    instanceType: t3.medium
+    userData: "" # Will be set at apply time because userData contains a token
+    iamInstanceProfile: dynatrace-active-gate

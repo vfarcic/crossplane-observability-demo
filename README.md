@@ -82,9 +82,13 @@ curl "http://sillydemo.$INGRESS_IP.nip.io/videos" | jq .
 
 ## Dynatrace
 
-The Dynatrace operator is installed and configured via the setup script.
+All Dynatrace components are installed and configured via the setup script. The following components will be enabled
+during setup:
 
-FIXME: @Kathi: Add (eventually automate) instructions on how to add dashboards
+- [Dynatrace Kubernetes Operator](https://github.com/Dynatrace/dynatrace-operator) to monitor the local Kubernetes
+  cluster
+- [Dynatrace Active Gate on AWS]() to monitor the given AWS account
+- A Crossplane for Platform Engineers dashboard will be created
 
 ```sh
 curl "http://sillydemo.$INGRESS_IP.nip.io/videos"

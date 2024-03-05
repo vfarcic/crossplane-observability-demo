@@ -1,0 +1,8 @@
+#!/bin/sh
+set -e
+
+wget -O /Dynatrace-ActiveGate-Linux-x86-1.261.190.sh "https://ovw30140.live.dynatrace.com/api/v1/deployment/installer/gateway/unix/latest?arch=x86&flavor=default" --header="Authorization: Api-Token {{ TOKEN }}"
+wget https://ca.dynatrace.com/dt-root.cert.pem ; ( echo 'Content-Type: multipart/signed; protocol="application/x-pkcs7-signature"; micalg="sha-256"; boundary="--SIGNED-INSTALLER"'; echo ; echo ; echo '----SIGNED-INSTALLER' ; cat Dynatrace-ActiveGate-Linux-x86-1.261.190.sh ) | openssl cms -verify -CAfile dt-root.cert.pem > /dev/null
+/bin/bash /Dynatrace-ActiveGate-Linux-x86-1.261.190.sh
+rm /Dynatrace-ActiveGate-Linux-x86-1.261.190.sh
+systemctl enable --now dynatracegateway

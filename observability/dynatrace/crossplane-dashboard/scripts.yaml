@@ -1,0 +1,39 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: scripts
+  namespace: dynatrace
+data:
+  create-dashboard.sh: |
+    printf "Installing packages\n"
+    apk add curl
+    apk add jq
+    
+    printf "\nFetching OAuth token\n"
+    token=$(curl --request POST 'https://sso-sprint.dynatracelabs.com/sso/oauth2/token' \
+    --silent \
+    --header 'Content-Type: application/x-www-form-urlencoded' \
+    --data-urlencode 'grant_type=client_credentials' \
+    --data-urlencode "client_id=$OAUTH_CLIENT_ID" \
+    --data-urlencode "client_secret=$OAUTH_CLIENT_SECRET" \
+    --data-urlencode 'scope=document:documents:write document:documents:read' \
+    | jq -r .access_token)
+    
+    printf "\nCreating dashboard\n"
+    cp dashboards/$DASHBOARD.json dashboard.json
+    sed -i -e "s/{{ CLUSTER }}/$CLUSTER/g" dashboard.json
+    sed -i -e "s/{{ DEPLOYMENT }}/$DEPLOYMENT/g" dashboard.json
+    sed -i -e "s/{{ NAMESPACE }}/$NAMESPACE/g" dashboard.json
+    sed -i -e "s/{{ DB_NAME }}/$DB_NAME/g" dashboard.json
+    documentId=$(curl --request POST 'https://ypd98635.sprint.apps.dynatracelabs.com/platform/document/v1/documents' \
+    --silent \
+    --header "Authorization: Bearer $token" \
+    --header 'Content-Type: multipart/form-data' \
+    --form name="$TITLE" \
+    --form type=dashboard \
+    --form content=@dashboard.json \
+    | jq -r .id)
+    rm dashboard.json
+    
+    printf "\nConfiguring access\n"
+    # TODO - configure shares

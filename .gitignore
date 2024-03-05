@@ -2,7 +2,7 @@
 bin
 *-creds.conf
 .env
-*.local.yaml
+*.local.*
 /azure-creds.json
 /gcp-creds.json
 /kubeconfig.yaml

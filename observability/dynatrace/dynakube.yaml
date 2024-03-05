@@ -8,12 +8,14 @@ metadata:
 spec:
   apiUrl: https://ypd98635.sprint.dynatracelabs.com/api
   oneAgent:
-    applicationMonitoring:
-      useCSIDriver: true
+    cloudNativeFullStack:
+      image: ""
   activeGate:
     capabilities:
       - kubernetes-monitoring
       - routing
+      - metrics-ingest
+      - dynatrace-api
     image: ""
     resources:
       requests:
