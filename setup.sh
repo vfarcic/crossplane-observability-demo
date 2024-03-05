@@ -111,12 +111,12 @@ helm upgrade --install atlas-operator \
 
 echo "# External Secrets" | gum format
 
-helm repo add external-secrets https://charts.external-secrets.io
+helm repo add external-secrets 
+
 helm upgrade --install \
     external-secrets external-secrets/external-secrets \
     --namespace external-secrets --create-namespace --wait
 
-# FIXME: This is using the AWS credentials that are saved on the device, not the ones you pass to the script
 echo '## We are about to create a Secret in AWS Secret Manager. The command that follows will display output and you should press `q` to continue.' \
     | gum format
 gum input --placeholder "Press the enter key to continue."
@@ -154,8 +154,11 @@ echo "export DYNATRACE_OPERATOR_TOKEN=$DYNATRACE_OPERATOR_TOKEN" >> .env
 DYNATRACE_DATA_INGEST_TOKEN=$(gum input --placeholder "Dynatrace Data Ingest Token" --value "$DYNATRACE_DATA_INGEST_TOKEN" --password)
 echo "export DYNATRACE_DATA_INGEST_TOKEN=$DYNATRACE_DATA_INGEST_TOKEN" >> .env
 
-helm repo add dynatrace-operator-stable https://raw.githubusercontent.com/Dynatrace/dynatrace-operator/main/config/helm/repos/stable
-helm upgrade --install dynatrace-operator dynatrace-operator-stable/dynatrace-operator \
+helm repo add dynatrace-operator-stable \
+    https://raw.githubusercontent.com/Dynatrace/dynatrace-operator/main/config/helm/repos/stable
+
+helm upgrade --install dynatrace-operator \
+    dynatrace-operator-stable/dynatrace-operator \
     --version 0.15.0 \
     --namespace dynatrace --create-namespace \
     --set installCRD=true --set csidriver.enabled=true \
@@ -180,7 +183,8 @@ yq --inplace \
 # AWS Monitoring
 # FIXME: This can be automated via the config api
 gum confirm "
-Next, we are going to configure AWS monitoring. This means, we are going to deploy two IAM roles, an IAM policy and an EC2 instance.
+Next, we are going to configure AWS monitoring.
+This means, we are going to deploy two IAM roles, an IAM policy and an EC2 instance.
 Please generate a token first:
 
 - Navigate to the Dynatrace $(gum style --foreground 212 'AWS Classic') app (Ctrl + K and type AWS)
@@ -197,16 +201,25 @@ Please generate a token first:
 Ready?
 " || exit 0
 
-DYNATRACE_AWS_TOKEN=$(gum input --placeholder "Token" --value "$DYNATRACE_AWS_TOKEN" --password)
+DYNATRACE_AWS_TOKEN=$(gum input --placeholder "Token" \
+    --value "$DYNATRACE_AWS_TOKEN" --password)
+
 echo "export DYNATRACE_AWS_TOKEN=$DYNATRACE_AWS_TOKEN" >> .env
 
-cp ./observability/dynatrace/aws/userData.txt ./observability/dynatrace/aws/userData.local.txt
-sed -i -e "s/{{ TOKEN }}/$DYNATRACE_AWS_TOKEN/g" ./observability/dynatrace/aws/userData.local.txt
+cp ./observability/dynatrace/aws/userData.txt \
+    ./observability/dynatrace/aws/userData.local.txt
+sed -i -e "s/{{ TOKEN }}/$DYNATRACE_AWS_TOKEN/g" \
+    ./observability/dynatrace/aws/userData.local.txt
 
-AWS_USER_DATA=$(cat ./observability/dynatrace/aws/userData.local.txt | base64)
+AWS_USER_DATA=$(cat \
+    ./observability/dynatrace/aws/userData.local.txt | base64)
 
-cp observability/dynatrace/aws/ec2.yaml observability/dynatrace/aws/ec2.local.yaml
-yq -i e "(.spec.forProvider | select(has(\"userData\")).userData) = \"$AWS_USER_DATA\"" observability/dynatrace/aws/ec2.local.yaml
+cp observability/dynatrace/aws/ec2.yaml \
+    observability/dynatrace/aws/ec2.local.yaml
+
+yq -i e "(.spec.forProvider | \
+    select(has(\"userData\")).userData) = \"$AWS_USER_DATA\"" \
+    observability/dynatrace/aws/ec2.local.yaml
 
 kubectl apply -f ./observability/dynatrace/aws/policy.yaml
 kubectl apply -f ./observability/dynatrace/aws/roles.yaml
@@ -235,12 +248,17 @@ Last, we need to configure an OAuth client to automatically create Dynatrace Das
 Ready?
 " || exit 0
 
-DYNATRACE_OAUTH_CLIENT_ID=$(gum input --placeholder "Client ID" --value "$DYNATRACE_OAUTH_CLIENT_ID" --password)
+DYNATRACE_OAUTH_CLIENT_ID=$(gum input \
+    --placeholder "Client ID" \
+    --value "$DYNATRACE_OAUTH_CLIENT_ID" \
+    --password)
 echo "export DYNATRACE_OAUTH_CLIENT_ID=$DYNATRACE_OAUTH_CLIENT_ID" >> .env
-DYNATRACE_OAUTH_CLIENT_SECRET=$(gum input --placeholder "Client Secret" --value "$DYNATRACE_OAUTH_CLIENT_SECRET" --password)
+DYNATRACE_OAUTH_CLIENT_SECRET=$(gum input \
+    --placeholder "Client Secret" \
+    --value "$DYNATRACE_OAUTH_CLIENT_SECRET" \
+    --password)
 echo "export DYNATRACE_OAUTH_CLIENT_SECRET=$DYNATRACE_OAUTH_CLIENT_SECRET" >> .env
 
-# FIXME: Use external secrets
 kubectl --namespace dynatrace \
     create secret generic oauth-credentials \
     --from-literal=clientId=$DYNATRACE_OAUTH_CLIENT_ID \

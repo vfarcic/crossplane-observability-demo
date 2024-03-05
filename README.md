@@ -1,7 +1,5 @@
 ## Intro
 
-FIXME: Add Ingress to the cluster
-
 FIXME: Tested only on AWS
 
 ## Setup
@@ -12,7 +10,7 @@ git clone https://github.com/vfarcic/crossplane-observability-demo
 cd crossplane-observability-demo
 ```
 
-FIXME: Nix reference
+FIXME: Install `nix` by following the instructions at https://nix.dev/install-nix. Watch https://youtu.be/0ulldVwZiKA if you are not familiar with Nix. Alternatively, you can skip executing `nix-shell` but, in that case, you need the tools used in this demo installed on your host machine.
 
 ```sh
 nix-shell --run $SHELL
@@ -101,3 +99,5 @@ FIXME: Delete traefik
 ```sh
 ./destroy.sh
 ```
+
+FIXME: @vfarcic Add `observability/dynatrace/crossplane-dashboard` to the Composition
