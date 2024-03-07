@@ -23,6 +23,9 @@ spec:
           - fromSecret: dynatrace-tokens
             toSecret: a-team-cluster-2
             toNamespace: dynatrace
+          - fromSecret: dynatrace-tokens
+            toSecret: dynatrace-tokens-2
+            toNamespace: dynatrace
       traefik:
         enabled: true
       dynatrace:

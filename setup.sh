@@ -111,7 +111,8 @@ helm upgrade --install atlas-operator \
 
 echo "# External Secrets" | gum format
 
-helm repo add external-secrets 
+helm repo add external-secrets \
+    https://charts.external-secrets.io
 
 helm upgrade --install \
     external-secrets external-secrets/external-secrets \
@@ -164,7 +165,6 @@ helm upgrade --install dynatrace-operator \
     --set installCRD=true --set csidriver.enabled=true \
     --atomic --wait
 
-# FIXME: Switch to `external-secrets`
 kubectl --namespace dynatrace \
     create secret generic crossplane-observability-demo \
     --from-literal=apiToken=$DYNATRACE_OPERATOR_TOKEN \

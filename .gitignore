@@ -2,6 +2,7 @@
 bin
 *-creds.conf
 .env
+.env-orig
 *.local.*
 /azure-creds.json
 /gcp-creds.json

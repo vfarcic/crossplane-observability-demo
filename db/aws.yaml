@@ -22,7 +22,7 @@ spec:
       pullToClusterNamespace: production
     dynatraceDashboard:
       enabled: true
-      oathCredentialsSecretName: my-oauth-creds
+      oathCredentialsSecretName: dynatrace-tokens
       cluster: a-team-cluster
       appDeploymentName: silly-demo
       appNamespace: production
