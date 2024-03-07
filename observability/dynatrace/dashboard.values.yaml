@@ -1,0 +1,18 @@
+# -- The secret that contains the OAuth client id & secret used to get at token for creating the dashboard. Expected secret keys: clientId & clientSecret
+oauthCredentialsSecretName: oauth-credentials
+
+# -- The dashboards that should be created
+dashboards:
+  # -- A dashboard that contains a collection of Crossplane metrics. Target group: Platform Engineers
+  crossplaneMetrics:
+    # -- Whether the dashboard is enabled or not.
+    enabled: true
+    # -- The title of the dasbhoard
+    title: Crossplane for Platform Engineers (crossplane-observability-demo)
+    # -- The name of the Kubernetes cluster to monitor with this dashboard
+    cluster: crossplane-observability-demo
+
+  # -- A dashboard that contains information about an application. Target group: Developers
+  app:
+    # -- Whether the dashboard is enabled or not
+    enabled: false

@@ -264,14 +264,12 @@ kubectl --namespace dynatrace \
     --from-literal=clientId=$DYNATRACE_OAUTH_CLIENT_ID \
     --from-literal=clientSecret=$DYNATRACE_OAUTH_CLIENT_SECRET
 
-kubectl apply -f ./observability/dynatrace/crossplane-dashboard
+helm repo add crossplane-observability-demo-dashboards https://katharinasick.github.io/crossplane-observability-demo-dashboards
 
-set +e
-aws secretsmanager delete-secret --secret-id dynatrace-tokens \
-    --region us-east-1 --force-delete-without-recovery \
-    --no-cli-page
-sleep 10
-set -e
+helm upgrade --install dashboards crossplane-observability-demo-dashboards/dashboards \
+    --namespace dynatrace \
+    --values ./observability/dynatrace/dashboard.values.yaml \
+    --wait
 
 aws secretsmanager create-secret \
     --name dynatrace-tokens --region us-east-1 \

@@ -10,6 +10,5 @@
 ### Automation
 
 - Create Slack notifications for problems
-- Fix the Dynatrace operator in the cluster composition
 - Automate Dynatrace AWS setup
 - Automate Dynatrace OAuth client creation
