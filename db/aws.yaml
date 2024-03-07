@@ -20,6 +20,12 @@ spec:
       pushToStore: true
       pullToCluster: a-team-cluster
       pullToClusterNamespace: production
+    dynatraceDashboard:
+      enabled: true
+      oathCredentialsSecretName: my-oauth-creds
+      cluster: a-team-cluster
+      appDeploymentName: silly-demo
+      appNamespace: production
     schemas:
       - database: my-db
         sql: |
