@@ -52,8 +52,6 @@ export KUBECONFIG=$PWD/kubeconfig.yaml
 aws eks update-kubeconfig --region us-east-1 \
     --name a-team-cluster --kubeconfig $KUBECONFIG
 
-cat app/*.yaml
-
 export INGRESS_HOSTNAME=$(kubectl --namespace traefik \
     get service traefik \
     --output jsonpath="{.status.loadBalancer.ingress[0].hostname}")
@@ -61,18 +59,32 @@ export INGRESS_HOSTNAME=$(kubectl --namespace traefik \
 export INGRESS_IP=$(dig +short $INGRESS_HOSTNAME \
     | awk '{print $1;}' | head -n 1)
 
+echo $INGRESS_IP
+
+# Repeat the `export` commands if the output is empty
+
+unset KUBECONFIG
+
+cat app.yaml
+
 yq --inplace \
-    ".spec.rules[0].host = \"sillydemo.$INGRESS_IP.nip.io\"" \
-    app/ingress.yaml
+    ".spec.parameters.host = \"silly-demo.$INGRESS_IP.nip.io\"" \
+    app.yaml
 
-kubectl --namespace production apply --filename app/
+kubectl --namespace a-team apply --filename app.yaml
 
-curl "http://sillydemo.$INGRESS_IP.nip.io"
+crossplane beta trace appclaim silly-demo --namespace a-team
+
+export KUBECONFIG=$PWD/kubeconfig.yaml
+
+kubectl --namespace production get all
+
+curl "http://silly-demo.$INGRESS_IP.nip.io"
 
 curl -X POST \
-    "http://sillydemo.$INGRESS_IP.nip.io/video?id=1&title=An%20Amazing%20Video"
+    "http://silly-demo.$INGRESS_IP.nip.io/video?id=1&title=An%20Amazing%20Video"
 
-curl "http://sillydemo.$INGRESS_IP.nip.io/videos" | jq .
+curl "http://silly-demo.$INGRESS_IP.nip.io/videos" | jq .
 ```
 
 * Generate load on https://app.ddosify.com
@@ -99,5 +111,3 @@ FIXME: Delete traefik
 ```sh
 ./destroy.sh
 ```
-
-FIXME: @vfarcic Add `observability/dynatrace/crossplane-dashboard` to the Composition

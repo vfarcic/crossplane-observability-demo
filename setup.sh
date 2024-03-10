@@ -79,6 +79,8 @@ kubectl apply --filename crossplane-packages/dot-kubernetes.yaml
 
 kubectl apply --filename crossplane-packages/dot-sql.yaml
 
+kubectl apply --filename crossplane-packages/dot-app.yaml
+
 kubectl apply --filename crossplane-packages/helm-incluster.yaml
 
 kubectl apply \
