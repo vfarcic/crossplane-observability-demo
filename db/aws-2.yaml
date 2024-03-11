@@ -26,6 +26,7 @@ spec:
       cluster: a-team-cluster-2
       appDeploymentName: silly-demo
       appNamespace: production
+      slackChannel: "a-team"
     schemas:
       - database: my-db
         sql: |
