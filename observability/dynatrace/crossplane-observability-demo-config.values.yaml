@@ -1,0 +1,9 @@
+oauthCredentialsSecretName: oauth-credentials
+
+cluster: crossplane-observability-demo
+
+dashboards:
+  crossplaneMetrics:
+    enabled: true
+  clusterOverview:
+    enabled: true

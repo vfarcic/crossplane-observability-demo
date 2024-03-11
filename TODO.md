@@ -9,6 +9,5 @@
 
 ### Automation
 
-- Create Slack notifications for problems
 - Automate Dynatrace AWS setup
 - Automate Dynatrace OAuth client creation
