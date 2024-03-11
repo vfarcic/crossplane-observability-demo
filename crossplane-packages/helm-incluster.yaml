@@ -40,3 +40,13 @@ spec:
   package: xpkg.upbound.io/crossplane-contrib/provider-helm:v0.15.0
   controllerConfigRef:
     name: crossplane-provider-helm
+
+---
+
+apiVersion: helm.crossplane.io/v1beta1
+kind: ProviderConfig
+metadata:
+  name: default
+spec:
+  credentials:
+    source: InjectedIdentity

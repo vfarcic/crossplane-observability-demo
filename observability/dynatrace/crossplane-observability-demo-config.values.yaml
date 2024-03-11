@@ -1,0 +1,12 @@
+# -- The secret that contains the OAuth client id & secret used to get at token for creating the dashboard. Expected secret keys: clientId & clientSecret
+oauthCredentialsSecretName: oauth-credentials
+
+# -- The name of the Kubernetes cluster
+cluster: crossplane-observability-demo
+
+# -- Dynatrace dashboard configuration
+dashboards:
+  # -- Crossplane metrics dashboard configuration
+  crossplaneMetrics:
+    # -- Whether to create a Crossplane metrics dashboard or not
+    enabled: true

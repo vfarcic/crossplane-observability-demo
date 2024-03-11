@@ -75,6 +75,8 @@ kubectl --namespace crossplane-system \
     --from-literal accessKeyID=$AWS_ACCESS_KEY_ID \
     --from-literal secretAccessKey=$AWS_SECRET_ACCESS_KEY
 
+kubectl apply --filename crossplane-config/deployment-runtime-config.yaml
+
 kubectl apply --filename crossplane-packages/dot-kubernetes.yaml
 
 kubectl apply --filename crossplane-packages/dot-sql.yaml
@@ -85,6 +87,9 @@ kubectl apply --filename crossplane-packages/helm-incluster.yaml
 
 kubectl apply \
     --filename crossplane-packages/kubernetes-incluster.yaml
+
+kubectl apply \
+    --filename crossplane-packages/terraform.yaml
 
 echo "## Waiting for Crossplane packages to be ready (<=30 min.)..." \
     | gum format
@@ -182,6 +187,10 @@ yq --inplace \
     ".spec.parameters.apps.dynatrace.apiUrl = \"$DYNATRACE_URL/api\"" \
     cluster/aws.yaml
 
+aws secretsmanager create-secret \
+    --name dynatrace-tokens --region us-east-1 \
+    --secret-string "{\"apiToken\": \"$DYNATRACE_OPERATOR_TOKEN\", \"dataIngestToken\": \"$DYNATRACE_DATA_INGEST_TOKEN\"}"
+
 # AWS Monitoring
 # FIXME: This can be automated via the config api
 gum confirm "
@@ -189,8 +198,8 @@ Next, we are going to configure AWS monitoring.
 This means, we are going to deploy two IAM roles, an IAM policy and an EC2 instance.
 Please generate a token first:
 
-- Navigate to the Dynatrace $(gum style --foreground 212 'AWS Classic') app (Ctrl + K and type AWS)
-- Select $(gum style --foreground 212 'Enable AWS monitoring')
+- Navigate to the Dynatrace $(gum style --foreground 212 'Clouds') app (Ctrl + K and type Clouds)
+- Select $(gum style --foreground 212 'Configure') -> $(gum style --foreground 212 'AWS connections') in the top right
 - Select $(gum style --foreground 212 'Connect new instance')
 - Enter the following data:
   - Connection Name: Whatever you prefer, this is the display name of the AWS connection (e.g. name of the AWS account)
@@ -239,9 +248,9 @@ Done?
 # Crossplane Dashboard
 # FIXME: is there an API for creating oauth clients?
 gum confirm "
-Last, we need to configure an OAuth client to automatically create Dynatrace Dashboards:
+Next, we need to configure an OAuth client to automatically create Dynatrace Dashboards:
 
-- Click on your use icon in the bottom left and select $(gum style --foreground 212 'Account Management')
+- Click on your user icon in the bottom left and select $(gum style --foreground 212 'Account Management')
 - Select the account of your tenant
 - Click on $(gum style --foreground 212 'Identity & access management') -> $(gum style --foreground 212 'OAuth clients')
 - Create a new OAuth client and select all $(gum style --foreground 212 'Document Service scopes')
@@ -266,16 +275,47 @@ kubectl --namespace dynatrace \
     --from-literal=clientId=$DYNATRACE_OAUTH_CLIENT_ID \
     --from-literal=clientSecret=$DYNATRACE_OAUTH_CLIENT_SECRET
 
-helm repo add crossplane-observability-demo-dashboards https://katharinasick.github.io/crossplane-observability-demo-dashboards
+helm repo add crossplane-observability-demo-dynatrace https://katharinasick.github.io/crossplane-observability-demo-dynatrace
 
-helm upgrade --install dashboards crossplane-observability-demo-dashboards/dashboards \
+helm upgrade --install crossplane-observability-demo crossplane-observability-demo-dynatrace/kubernetes-cluster \
     --namespace dynatrace \
-    --values ./observability/dynatrace/dashboard.values.yaml \
+    --values ./observability/dynatrace/crossplane-observability-demo-config.values.yaml \
     --wait
 
-aws secretsmanager create-secret \
-    --name dynatrace-tokens --region us-east-1 \
-    --secret-string "{\"apiToken\": \"$DYNATRACE_OPERATOR_TOKEN\", \"dataIngestToken\": \"$DYNATRACE_DATA_INGEST_TOKEN\", \"oauthClientId\": \"$DYNATRACE_OAUTH_CLIENT_ID\", \"oauthClientSecret\": \"$DYNATRACE_OAUTH_CLIENT_SECRET\"}"
+#FIXME: Can be automated
+gum confirm "
+To receive Slack notifications about alerts, you need to generate a Dynatrace access token and a Slack webhook.
+Let's start with the Dynatrace access token:
+
+- Navigate to the Dynatrace $(gum style --foreground 212 'Access Tokens') app (Ctrl + K and type Access Tokens)
+- Click on $(gum style --foreground 212 'Generate new token') in the top right
+- Give the token a name and select the scopes $(gum style --foreground 212 'settings.read') & $(gum style --foreground 212 'settings.write')
+- Click on $(gum style --foreground 212 'Generate token') and copy the generated token
+
+Ready?
+" || exit 0
+
+DYNATRACE_SETTINGS_ACCESS_TOKEN=$(gum input \
+    --placeholder "Access Token" \
+    --value "$DYNATRACE_SETTINGS_ACCESS_TOKEN" \
+    --password)
+echo "export DYNATRACE_SETTINGS_ACCESS_TOKEN=$DYNATRACE_SETTINGS_ACCESS_TOKEN" >> .env
+
+gum confirm "
+Now create an incoming Slack webhook as described in the documentation: https://api.slack.com/messaging/webhooks
+
+Ready?
+" || exit 0
+
+SLACK_WEBHOOK=$(gum input \
+    --placeholder "Slack Webhook URL" \
+    --value "$SLACK_WEBHOOK" \
+    --password)
+echo "export SLACK_WEBHOOK=$SLACK_WEBHOOK" >> .env
+
+kubectl --namespace crossplane-system \
+  create secret generic dynatrace-terraform-creds \
+  --from-literal=credentials="{\"dt_env_url\": \"$DYNATRACE_URL\", \"dt_api_token\": \"$DYNATRACE_SETTINGS_ACCESS_TOKEN\", \"slack_webhook\": \"$SLACK_WEBHOOK\"}"
 
 ########
 # Misc #
