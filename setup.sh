@@ -101,9 +101,6 @@ kubectl wait --for=condition=healthy provider.pkg.crossplane.io \
 
 kubectl apply \
     --filename crossplane-packages/aws-config.yaml
-kubectl apply \
-    --filename crossplane-packages/helm-incluster-config.yaml
-
 
 ##################
 # Atlas Operator #

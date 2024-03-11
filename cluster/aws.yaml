@@ -31,6 +31,7 @@ spec:
       dynatrace:
         enabled: true
         apiUrl: https://ypd98635.sprint.dynatracelabs.com/api
+        oathCredentialsSecretName: dynatrace-tokens
     creds:
       name: aws-creds
       namespace: crossplane-system
