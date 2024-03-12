@@ -10,3 +10,11 @@ spec:
         metrics.dynatrace.com/scrape: "true"
         metrics.dynatrace.com/port: "8080"
         metrics.dynatrace.com/path: /metrics
+    spec:
+      selector: {}
+      template:
+        metadata:
+          annotations:
+            metrics.dynatrace.com/scrape: "true"
+            metrics.dynatrace.com/port: "8080"
+            metrics.dynatrace.com/path: /metrics

@@ -16,7 +16,7 @@ START_ID=$(gum input --placeholder "At which video id should we start?" --value 
 for i in $(seq 1 "$NUMBER_OF_REQUESTS");
 do
   id=$(("$START_ID" + "$i"))
-  curl -X POST -s -o /dev/null "http://sillydemo.$INGRESS_IP.nip.io/video?id=$id&title=Amazing%20Video%20%23$id" &
+  curl -X POST -s -o /dev/null "http://silly-demo.$INGRESS_IP.nip.io/video?id=$id&title=Amazing%20Video%20%23$id" &
 done
 
 wait
