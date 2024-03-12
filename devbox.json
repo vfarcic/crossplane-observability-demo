@@ -1,0 +1,21 @@
+{
+  "packages": [
+    "gum@0.13.0",
+    "gh@2.45.0",
+    "kubernetes-helm@3.14.2",
+    "kubectl@1.29.2",
+    "kind@0.22.0",
+    "yq-go@4.42.1",
+    "jq@1.7.1",
+    "bat@0.24.0",
+    "awscli2@2.15.15",
+    "teller@1.5.6",
+    "crossplane-cli@1.15.0"
+  ],
+  "shell": {
+    "init_hook": [
+      "alias cat='bat --paging never --theme DarkNeon --style plain'"
+    ],
+    "scripts": {}
+  }
+}

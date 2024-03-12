@@ -10,10 +10,10 @@ git clone https://github.com/vfarcic/crossplane-observability-demo
 cd crossplane-observability-demo
 ```
 
-FIXME: Install `nix` by following the instructions at https://nix.dev/install-nix. Watch https://youtu.be/0ulldVwZiKA if you are not familiar with Nix. Alternatively, you can skip executing `nix-shell` but, in that case, you need the tools used in this demo installed on your host machine.
+FIXME: Devbox reference
 
 ```sh
-nix-shell --run $SHELL
+devbox shell
 
 chmod +x setup.sh
 

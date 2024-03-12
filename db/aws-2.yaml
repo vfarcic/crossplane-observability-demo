@@ -20,13 +20,6 @@ spec:
       pushToStore: true
       pullToCluster: a-team-cluster-2
       pullToClusterNamespace: production
-    dynatraceDashboard:
-      enabled: true
-      oathCredentialsSecretName: dynatrace-tokens-2
-      cluster: a-team-cluster-2
-      appDeploymentName: silly-demo
-      appNamespace: production
-      slackChannel: "a-team"
     schemas:
       - database: my-db
         sql: |
