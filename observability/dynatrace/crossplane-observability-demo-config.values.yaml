@@ -1,4 +1,4 @@
-oauthCredentialsSecretName: oauth-credentials
+oauthCredentialsSecretName: dynatrace-tokens
 
 cluster: crossplane-observability-demo
 

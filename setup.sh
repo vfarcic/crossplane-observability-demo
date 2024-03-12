@@ -271,7 +271,7 @@ DYNATRACE_OAUTH_CLIENT_SECRET=$(gum input \
 echo "export DYNATRACE_OAUTH_CLIENT_SECRET=$DYNATRACE_OAUTH_CLIENT_SECRET" >> .env
 
 kubectl --namespace dynatrace \
-    create secret generic oauth-credentials \
+    create secret generic dynatrace-tokens \
     --from-literal=clientId=$DYNATRACE_OAUTH_CLIENT_ID \
     --from-literal=clientSecret=$DYNATRACE_OAUTH_CLIENT_SECRET
 
