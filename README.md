@@ -106,8 +106,6 @@ curl "http://sillydemo.$INGRESS_IP.nip.io/videos"
 
 ## Destroy
 
-FIXME: Delete traefik
-
 ```sh
 ./destroy.sh
 ```

@@ -29,6 +29,10 @@ Do you have those tools installed?
 
 echo "# Cluster" | gum format
 
+KUBECONFIG=$PWD/kubeconfig.yaml
+
+kubectl --namespace traefik delete service traefik
+
 unset KUBECONFIG
 
 echo "## Deleting resources..." | gum format
